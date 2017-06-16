@@ -1,0 +1,191 @@
+1.创建nodejs网站  可以是多个网站
+
+
+	http://127.0.0.1:8010
+	http://127.0.0.1:8011
+	http://127.0.0.1:8012
+
+2.下载nginx
+
+
+
+	减压的c盘
+
+
+3.配置nginx
+
+	C:\nginx\conf\nginx.conf
+
+
+4.配置nginx.conf
+
+	1.找到 http，在http里面加入
+
+		# server 127.0.0.1:8000;        转发的服务器地址
+		
+		http {
+			
+
+
+			   upstream backaaa {
+
+			       #ip_hash;
+
+			       server 127.0.0.1:8000;        
+
+			    }
+
+			     upstream backbbb {
+
+			       #ip_hash;
+
+			       server 127.0.0.1:8001;
+
+
+			    }
+
+
+
+		
+		
+		}
+
+	2.注释掉
+
+	     http{
+	     
+		 server {
+			
+			
+			#location / {
+			#    root   html;
+			#    index  index.html index.htm;
+		       # }
+
+		 }
+	     }
+
+
+	 3.复制下面代码到你的  server     。  http://bakeaaa  这个bakeaaa和上面对应起来
+
+			location / {
+
+			#设置主机头和客户端真实地址，以便服务器获取客户端真实IP
+
+			     proxy_set_header Host $host;
+
+			     proxy_set_header X-Real-IP $remote_addr;
+
+			     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+		 
+
+			     #禁用缓存
+
+			     proxy_buffering off; 
+
+			     #反向代理的地址
+
+			     proxy_pass http://bakeaaa;     
+
+			}
+
+	
+
+	4. 
+	
+	listen       80;
+        server_name  www.aaa.com;域名要改
+
+
+
+
+
+5.server完整配置
+
+
+  server {
+        listen       80;
+        server_name  www.aaa.com;      
+
+	location / {
+
+        #设置主机头和客户端真实地址，以便服务器获取客户端真实IP
+
+             proxy_set_header Host $host;
+
+             proxy_set_header X-Real-IP $remote_addr;
+
+	     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+
+ 
+
+             #禁用缓存
+
+             proxy_buffering off; 
+
+             #反向代理的地址
+
+             proxy_pass http://bakeaaa;     
+
+        }
+
+
+
+
+        #error_page  404              /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+    }
+
+
+    server {
+        listen       80;
+        server_name  www.bbb.com;
+     
+	location / {
+
+        #设置主机头和客户端真实地址，以便服务器获取客户端真实IP
+
+             proxy_set_header Host $host;
+
+             proxy_set_header X-Real-IP $remote_addr;
+
+	     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for; 
+
+             #禁用缓存
+
+             proxy_buffering off; 
+
+             #反向代理的地址
+
+             proxy_pass http://bakebbb;     
+
+        }
+
+
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+            root   html;
+        }
+
+       
+    }
+
+
+
+
+注意：配置完成以后重启 nginx服务
+
+
+     暴力方式 ：进程结束
+
+
+     然后重新双击  nginx.exe
+
